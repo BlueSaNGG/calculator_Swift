@@ -13,7 +13,6 @@ struct CalculateLogic {
     static var isFinishedTypingNumber: Bool = true
     static var isPercentaged: Bool = false
     static var isDecimalUsed: Bool = false
-    //tuple to store 2 elements
     private var intermediateCalculation: (number: Double, operation: String)?
     
     mutating func setNumber(_ number: Double) {
@@ -36,51 +35,39 @@ struct CalculateLogic {
                     CalculateLogic.isPercentaged = false
                     return n * 100
                 }
-            case "+":
-                self.intermediateCalculation = (number: n, operation: "+")
-                self.operationAC()
-                return n
-            case "-":
-                self.intermediateCalculation = (number: n, operation: "-")
-                self.operationAC()
-                return n
-            case "×":
-                self.intermediateCalculation = (number: n, operation: "*")
-                self.operationAC()
-                return n
-            case "÷":
-                self.intermediateCalculation = (number: n, operation: "/")
-                self.operationAC()
-                return n
             case "=":
-                if let finalCal = self.intermediateCalculation {
-                    let result = perfromTwoNumCalculation(finalCal, secondNumber: n)
-                    self.intermediateCalculation = (number: result, operation: "=")
-                    return result
+                guard let result = perfromTwoNumCalculation(secondNumber: n) else {
+                    fatalError("The result of the calculation is nil")
                 }
-                
+                self.intermediateCalculation = (number: result, operation: "=")
+                self.operationAC()
+                return result
             default:
-                return 0
+                self.intermediateCalculation = (number: n, operation: calSymbol)
+                self.operationAC()
+                return n
             }
         }
         return nil
     }
     
-    func perfromTwoNumCalculation(_ finalCal : (number: Double, operation: String), secondNumber: Double) -> Double {
-        var firstNum = finalCal.number
-        switch finalCal.operation {
-        case "+":
-            firstNum += secondNumber
-        case "-":
-            firstNum -= secondNumber
-        case "*":
-            firstNum *= secondNumber
-        case "/":
-            firstNum /= secondNumber
-        default:
-            break
+    private func perfromTwoNumCalculation(secondNumber: Double) -> Double? {
+        if let firstNum = intermediateCalculation?.number {
+            let operation = intermediateCalculation?.operation
+            switch operation {
+            case "+":
+                return firstNum + secondNumber
+            case "-":
+                return firstNum - secondNumber
+            case "×":
+                return firstNum * secondNumber
+            case "÷":
+                return firstNum / secondNumber
+            default:
+                return secondNumber
+            }
         }
-        return firstNum
+        return secondNumber
     }
     
     func operationAC() {
